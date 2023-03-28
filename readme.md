@@ -13,7 +13,7 @@ ChatGPT Plugin Creator is ideal for:
 To get started with ChatGPT Plugin Creator, follow these steps:
 
 ## Clone the repository:
-* git clone https://github.com/your_username/chatgpt-plugin-creator.git
+* git clone https://github.com/ruvnet/Swagger-ChatGPT-Plugin-Creator.git
 
 Change to the project directory:
 * cd chatgpt-plugin-creator
