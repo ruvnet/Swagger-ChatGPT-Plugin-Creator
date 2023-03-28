@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Conversion Results</title>
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- jQuery, Popper.js, and Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center my-4">Conversion Results</h1>
+    <div class="card mb-4">
+      <div class="card-header">ChatGPT Manifest</div>
+      <div class="card-body">
+        <pre>{{ manifest }}</pre>
+        <a href="/download/manifest.yaml" class="btn btn-primary">Download manifest.yaml</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">ChatGPT OpenAPI Specification</div>
+      <div class="card-body">
+        <pre>{{ openapi_spec }}</pre>
+        <a href="/download/openapi.yaml" class="btn btn-primary">Download openapi.yaml</a>
+      </div>
+    </div>
+    <div class="my-4">
+      <a href="/" class="btn btn-secondary">Back</a>
+    </div>
+  </div>
+</body>
+</html>

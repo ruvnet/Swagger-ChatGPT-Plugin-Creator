@@ -1,0 +1,33 @@
+# General
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.log
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Replit
+.replit
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+.Trash-*
