@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "First ChatGPT Plugin",
+  "name_for_model": "",
+  "description_for_human": "API for creating ChatGPT plugins from Swagger files.",
+  "description_for_model": "API for creating ChatGPT plugins from Swagger files.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://chatgpt-swagger-plug-in-creator.ruvnet.repl.co/plugins/spec_1680666056.yaml",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://ChatGPT-Swagger-Plug-in-Creator.ruvnet.repl.co/logo.png",
+  "contact_email": "ruv@ruv.net",
+  "legal_info_url": "https://ChatGPT-Swagger-Plug-in-Creator.ruvnet.repl.co/legal"
+}

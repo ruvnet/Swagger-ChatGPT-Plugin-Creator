@@ -1,0 +1,98 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ChatGPT Plugin Creator API",
+    "version": "1.0.0",
+    "description": "API for creating ChatGPT plugins from Swagger files."
+  },
+  "servers": [
+    {
+      "url": "https://chatgpt-swagger-plug-in-creator.ruvnet.repl.co"
+    }
+  ],
+  "paths": {
+    "/api/v1/create-plugin": {
+      "post": {
+        "summary": "Create a ChatGPT plugin from a Swagger file",
+        "operationId": "createChatGPTPlugin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Plugin name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Plugin description"
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "Plugin URL"
+                  },
+                  "contact_email": {
+                    "type": "string",
+                    "description": "Contact email"
+                  },
+                  "legal_info_url": {
+                    "type": "string",
+                    "description": "Legal info URL"
+                  },
+                  "logo_url": {
+                    "type": "string",
+                    "description": "Logo URL"
+                  },
+                  "swaggerFile": {
+                    "type": "string",
+                    "description": "Swagger YAML content"
+                  },
+                  "user_authenticated": {
+                    "type": "boolean",
+                    "description": "Indicates if the user is authenticated"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "manifest_file": {
+                      "type": "string",
+                      "description": "Path to the manifest file"
+                    },
+                    "openapi_spec_file": {
+                      "type": "string",
+                      "description": "Path to the OpenAPI specification file"
+                    },
+                    "manifest": {
+                      "type": "string",
+                      "description": "Manifest YAML content"
+                    },
+                    "openapi_spec": {
+                      "type": "string",
+                      "description": "OpenAPI specification YAML content"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-auth-type": "none",
+        "x-auth-location": "query",
+        "description": "Endpoint for generating ChatGPT manifest and OpenAPI specification from the provided Swagger YAML and additional parameters."
+      }
+    }
+  }
+}

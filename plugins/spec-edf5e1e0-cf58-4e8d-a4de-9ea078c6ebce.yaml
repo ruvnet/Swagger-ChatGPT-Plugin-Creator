@@ -1,0 +1,66 @@
+info:
+  description: API for creating ChatGPT plugins from Swagger files.
+  title: ChatGPT Plugin Creator API
+  version: 1.0.0
+openapi: 3.0.0
+paths:
+  /api/v1/create-plugin:
+    post:
+      description: Endpoint for generating ChatGPT manifest and OpenAPI specification
+        from the provided Swagger YAML and additional parameters.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                contact_email:
+                  description: Contact email
+                  type: string
+                description:
+                  description: Plugin description
+                  type: string
+                legal_info_url:
+                  description: Legal info URL
+                  type: string
+                logo_url:
+                  description: Logo URL
+                  type: string
+                name:
+                  description: Plugin name
+                  type: string
+                swaggerFile:
+                  description: Swagger YAML content
+                  type: string
+                url:
+                  description: Plugin URL
+                  type: string
+                user_authenticated:
+                  description: Indicates if the user is authenticated
+                  type: boolean
+              type: object
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  manifest:
+                    description: Manifest YAML content
+                    type: string
+                  manifest_file:
+                    description: Path to the manifest file
+                    type: string
+                  openapi_spec:
+                    description: OpenAPI specification YAML content
+                    type: string
+                  openapi_spec_file:
+                    description: Path to the OpenAPI specification file
+                    type: string
+                type: object
+          description: Successful operation
+      summary: Create a ChatGPT plugin from a Swagger file
+      x-auth-location: query
+      x-auth-type: none
+servers:
+- url: https://ChatGPT-Swagger-Plug-in-Creator.ruvnet.repl.co

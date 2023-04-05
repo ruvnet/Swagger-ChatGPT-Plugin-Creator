@@ -1,0 +1,33 @@
+api:
+  is_user_authenticated: false
+  type: openapi
+  url: https://chatgpt-swagger-plug-in-creator.ruvnet.repl.co/plugins/spec_1680666056.yaml
+auth:
+  type: none
+contact_email: ruv@ruv.net
+description_for_human: API for creating ChatGPT plugins from Swagger files.
+description_for_model: API for creating ChatGPT plugins from Swagger files.
+legal_info_url: https://ChatGPT-Swagger-Plug-in-Creator.ruvnet.repl.co/legal
+logo_url: https://ChatGPT-Swagger-Plug-in-Creator.ruvnet.repl.co/logo.png
+name_for_human: First ChatGPT Plugin
+schema_version: v1
+
+
+{
+  "schema_version": "v1",
+  "name_for_human": "TODO Plugin",
+  "name_for_model": "todo",
+  "description_for_human": "Plugin for managing a TODO list. You can add, remove and view your TODOs.",
+  "description_for_model": "Plugin for managing a TODO list. You can add, remove and view your TODOs.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "http://localhost:3333/openapi.yaml",
+    "is_user_authenticated": false
+  },
+  "logo_url": "http://localhost:3333/logo.png",
+  "contact_email": "support@example.com",
+  "legal_info_url": "http://www.example.com/legal"
+}
