@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Swagger to ChatGPT Converter</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet"   href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      max-width: 800px;
+    }
+
+    pre {
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      padding: 1rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+
+  <!-- jQuery, Popper.js, and Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1 class="my-4">ChatGPT Plugin Creator - From Swagger</h1>
+    <div id="form-container">
+      <form id="converter-form" action="/" method="post" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="swaggerFile" class="form-label">Swagger (OpenAPI) File</label>
+        <input type="file" class="form-control" id="swaggerFile" name="swaggerFile" required>
+              </div>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name for Human</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="My API Plugin">
+      </div>
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <input type="text" class="form-control" id="description" name="description" placeholder="Plugin for interacting with my API.">
+      </div>
+      <div class="mb-3">
+        <label for="url" class="form-label">API URL</label>
+        <input type="url" class="form-control" id="url" name="url" placeholder="https://api.example.com/openapi.yaml">
+      </div>
+      <div class="mb-3">
+        <label for="user_authenticated" class="form-label">User Authentication</label>
+               <select class="form-select" id="user_authenticated" name="user_authenticated">
+          <option value="false" selected>No Authentication</option>
+          <option value="true">User Authentication</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="logo_url" class="form-label">Logo URL</label>
+        <input type="url" class="form-control" id="logo_url" name="logo_url" placeholder="https://api.example.com/logo.png">
+      </div>
+      <div class="mb-3">
+        <label for="contact_email" class="form-label">Contact Email</label>
+        <input type="email" class="form-control" id="contact_email" name="contact_email" placeholder="support@example.com">
+      </div>
+      <div class="mb-3">
+        <label for="legal_info_url" class="form-label">Legal Information URL</label>
+        <input type="url" class="form-control" id="legal_info_url" name="legal_info_url" placeholder="https://api.example.com/legal">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+
+    <div id="results-container" style="display:none;">
+      <div id="manifest-container" style="display:none;">
+        <h2 class="my-4">Generated ChatGPT Manifest</h2>
+        <pre id="manifest-content"></pre>
+        <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('manifest-content')">Copy</button>
+      </div>
+
+      <div id="spec-container" style="display:none;">
+        <h2 class="my-4">Generated ChatGPT API Specification</h2>
+        <pre id="spec-content"></pre>
+        <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('spec-content')">Copy</button>
+      </div>
+    </div>
+  </div>
+  
+<div id="progress-container" style="display:none;">
+  <h2 class="my-4">Processing...</h2>
+  <div class="progress">
+    <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+</div>
+  
+  <script>
+    $('#converter-form').on('submit', function(e) {
+  e.preventDefault();
+  if ($('#swaggerFile').get(0).files.length === 0) {
+    alert('Please select a Swagger (OpenAPI) file.');
+  } else {
+    var formData = new FormData(this);
+    $.ajax({
+      xhr: function() {
+        var xhr = new window.XMLHttpRequest();
+        xhr.upload.addEventListener('progress', function(evt) {
+          if (evt.lengthComputable) {
+            var percentComplete = evt.loaded / evt.total;
+            percentComplete = parseInt(percentComplete * 100);
+            $('#progress-bar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
+          }
+        }, false);
+        return xhr;
+      },
+      url: '/',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      beforeSend: function() {
+        $('#form-container').hide();
+        $('#progress-container').show();
+      },
+      success: function(data) {
+        $('#progress-container').hide();
+        $('#results-container').show();
+        if (data.manifest) {
+          $('#manifest-container').show();
+          $('#manifest-content').text(data.manifest);
+        }
+        if (data.openapi_spec) {
+          $('#spec-container').show();
+          $('#spec-content').text(data.openapi_spec);
+        }
+      },
+      error: function() {
+        $('#progress-container').hide();
+        $('#form-container').show();
+        alert('An error occurred while processing the request. Please try again.');
+      }
+    });
+  }
+});
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+
+<script>
+document.querySelector('form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const swaggerFile = document.querySelector('#swaggerFile');
+  const name = document.querySelector('#name');
+  const description = document.querySelector('#description');
+  const url = document.querySelector('#url');
+  const userAuthenticated = document.querySelector('#user_authenticated');
+  const logoUrl = document.querySelector('#logo_url');
+  const contactEmail = document.querySelector('#contact_email');
+  const legalInfoUrl = document.querySelector('#legal_info_url');
+
+  const data = new FormData();
+  data.append('swaggerFile', swaggerFile.files[0]);
+  data.append('name', name.value);
+  data.append('description', description.value);
+  data.append('url', url.value);
+  data.append('user_authenticated', userAuthenticated.value);
+  data.append('logo_url', logoUrl.value);
+  data.append('contact_email', contactEmail.value);
+  data.append('legal_info_url', legalInfoUrl.value);
+
+  const response = await fetch('/', {
+    method: 'POST',
+    body: data
+  });
+
+  if (response.ok) {
+    const result = await response.json();
+    document.querySelector('#generated_manifest').textContent = result.manifest;
+    document.querySelector('#generated_openapi_spec').textContent = result.openapi_spec;
+  } else {
+    alert('Error submitting the form');
+  }
+});  
+</script>
+    <script>
+    function copyToClipboard(id) {
+      const textArea = document.createElement('textarea');
+      textArea.value = document.getElementById(id).textContent;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Copied to clipboard');
+    }
+  </script>
+</body>
+</html>

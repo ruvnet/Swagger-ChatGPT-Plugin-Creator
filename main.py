@@ -9,163 +9,282 @@ import time
 from flask import Flask, request, render_template, send_from_directory, flash, jsonify
 import yaml
 from pathlib import Path
+from flask import jsonify
+import json
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 plugins_folder = 'plugins'
-base_url = "https://chatgpt-swagger-plug-in-creator.ruvnet.repl.co"  # Replace with your actual base URL
+base_url = "https://chatgpt-test-2.ruvnet.repl.co/"  # Replace with your actual base URL
+
+current_topic = None
 
 # Ensure the plugins folder exists
 if not os.path.exists(plugins_folder):
-    os.makedirs(plugins_folder)
-  
+  os.makedirs(plugins_folder)
+
+import json
+
+
+def load_json_data():
+  data_file_path = os.path.join('data', 'introduction.json')
+  with open(data_file_path, 'r') as file:
+    data = json.load(file, strict=False)
+  return data
+
+
+# Define a function to read the contents of the data/instructions.txt file
+def read_instructions_file():
+  file_path = os.path.join('data', 'introduction.txt')
+  with open(file_path, 'r') as file:
+    contents = file.read()
+  return contents
+
+
+# Add the requested endpoints
+@app.route('/introduction', methods=['GET', 'POST'])
+def introduction():
+  if request.method == 'POST':
+    # code to be executed
+    pass
+  else:
+    # Handle the GET request (default behavior)
+    instructions_text = read_instructions_file()
+    return instructions_text  # Return the contents of the file as plain text
+
+
+@app.route('/purpose')
+def purpose():
+  data = {'message': 'This is the purpose endpoint.'}
+  return jsonify(data)
+
+
+@app.route('/context')
+def context():
+  data = {'message': 'This is the context endpoint.'}
+  return jsonify(data)
+
+
+@app.route('/examples')
+def examples():
+  data = {'message': 'This is the examples endpoint.'}
+  return jsonify(data)
+
+
+@app.route('/errors')
+def errors():
+  data = {'message': 'This is the errors endpoint.'}
+  return jsonify(data)
+
+
+@app.route('/commands')
+def commands():
+  data = {'message': 'This is the commands endpoint.'}
+  return jsonify(data)
+
+
+@app.route('/action')
+def action():
+  data = {
+    'message':
+    'Define action commands wrapped in {{command}}.\n\nExample: {{command}}'
+  }
+  return jsonify(data)
+
+
+@app.route('/initialize')
+def initialize():
+  data = {'message': 'This is the initialize endpoint.'}
+  return jsonify(data)
+
+
+@app.route('/random', methods=['GET', 'POST'])
+def random():
+  if request.method == 'GET':
+    data = {
+      'message':
+      'creates a random ChatGPT Plugin bot and provides a output of a manifest.json and specification.yaml in a mark down code block.'
+    }
+    return jsonify(data)
+  elif request.method == 'POST':
+    input_data = request.get_json()
+    topic = input_data.get('topic', 'No topic provided')
+    data = {
+      'message':
+      f'You have provided the following topic: {topic}. Here is the output of a manifest.json and specification.yaml in mark down code block.'
+    }
+    return jsonify(data)
+
+
 @app.route('/api/v1/create-plugin', methods=['POST'])
 def create_plugin():
-    # Process the JSON data
-    data = request.get_json()
-  
-    # Get the form data
-    swagger_yaml = yaml.safe_load(data['swaggerFile'])
-    name = data.get('name')
-    description = data.get('description')
-    url = data.get('url')
-    user_authenticated = data.get('user_authenticated') == 'true'
-    logo_url = data.get('logo_url')
-    contact_email = data.get('contact_email')
-    legal_info_url = data.get('legal_info_url')
+  # Process the JSON data
+  data = request.get_json()
 
-        # Generate a unique file name with a timestamp
-    spec_file_name = f"spec_{int(time.time())}.yaml"
+  # Get the form data
+  swagger_yaml = yaml.safe_load(data['swaggerFile'])
+  name = data.get('name')
+  description = data.get('description')
+  url = data.get('url')
+  user_authenticated = data.get('user_authenticated') == 'true'
+  logo_url = data.get('logo_url')
+  contact_email = data.get('contact_email')
+  legal_info_url = data.get('legal_info_url')
 
-    # Convert the Swagger file to ChatGPT manifest and API specification
-    manifest, openapi_spec = convert_swagger_to_chatgpt_manifest(swagger_yaml, name, description, base_url, spec_file_name, user_authenticated, logo_url, contact_email, legal_info_url)
+  # Generate a unique file name with a timestamp
+  spec_file_name = f"spec_{int(time.time())}.yaml"
 
-    # Generate unique file names for the manifest and specification files
-    manifest_filename = os.path.join(plugins_folder, f'manifest-{uuid.uuid4()}.yaml')
-    openapi_spec_filename = os.path.join(plugins_folder, f'spec-{uuid.uuid4()}.yaml')
+  # Convert the Swagger file to ChatGPT manifest and API specification
+  manifest, openapi_spec = convert_swagger_to_chatgpt_manifest(
+    swagger_yaml, name, description, base_url, spec_file_name,
+    user_authenticated, logo_url, contact_email, legal_info_url)
 
-    # Save the manifest and specification files
-    with open(manifest_filename, 'w') as manifest_file:
-        manifest_file.write(manifest)
-    with open(openapi_spec_filename, 'w') as spec_file:
-        spec_file.write(openapi_spec)
-    
-    return jsonify({
-        'manifest_file': f"/plugins/{os.path.basename(manifest_filename)}",
-        'openapi_spec_file': f"/plugins/{os.path.basename(openapi_spec_filename)}",
-        'manifest': manifest,
-        'openapi_spec': openapi_spec
-    })
+  # Generate unique file names for the manifest and specification files
+  manifest_filename = os.path.join(plugins_folder,
+                                   f'manifest-{uuid.uuid4()}.yaml')
+  openapi_spec_filename = os.path.join(plugins_folder,
+                                       f'spec-{uuid.uuid4()}.yaml')
+
+  # Save the manifest and specification files
+  with open(manifest_filename, 'w') as manifest_file:
+    manifest_file.write(manifest)
+  with open(openapi_spec_filename, 'w') as spec_file:
+    spec_file.write(openapi_spec)
+
+  return jsonify({
+    'manifest_file': f"/plugins/{os.path.basename(manifest_filename)}",
+    'openapi_spec_file': f"/plugins/{os.path.basename(openapi_spec_filename)}",
+    'manifest': manifest,
+    'openapi_spec': openapi_spec
+  })
+
 
 from pathlib import Path
 import uuid
 
+
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
-    if request.method == 'POST':
-        # Process the form data
-        swagger_file = request.files['swaggerFile']
-        swagger_yaml = yaml.safe_load(swagger_file.read())
+  if request.method == 'POST':
+    # Process the form data
+    swagger_file = request.files['swaggerFile']
+    swagger_yaml = yaml.safe_load(swagger_file.read())
 
-        # Get additional form data
-        name = request.form.get('name')
-        description = request.form.get('description')
-        url = request.form.get('url')
-        user_authenticated = request.form.get('user_authenticated') == 'true'
-        logo_url = request.form.get('logo_url')
-        contact_email = request.form.get('contact_email')
-        legal_info_url = request.form.get('legal_info_url')
-  
-        # Convert the Swagger file to ChatGPT manifest and API specification
-        manifest, openapi_spec = convert_swagger_to_chatgpt_manifest(swagger_yaml, name, description, url, user_authenticated, logo_url, contact_email, legal_info_url)
+    # Get additional form data
+    name = request.form.get('name')
+    description = request.form.get('description')
+    url = request.form.get('url')
+    user_authenticated = request.form.get('user_authenticated') == 'true'
+    logo_url = request.form.get('logo_url')
+    contact_email = request.form.get('contact_email')
+    legal_info_url = request.form.get('legal_info_url')
 
-        # Save the manifest and specification files to the /plugins folder
-        Path("plugins").mkdir(parents=True, exist_ok=True)
+    # Convert the Swagger file to ChatGPT manifest and API specification
+    manifest, openapi_spec = convert_swagger_to_chatgpt_manifest(
+      swagger_yaml, name, description, url, user_authenticated, logo_url,
+      contact_email, legal_info_url)
 
-        manifest_filename = f"manifest-{uuid.uuid4()}.yaml"
-        with open(f"plugins/{manifest_filename}", "w") as manifest_file:
-            manifest_file.write(manifest)
+    # Save the manifest and specification files to the /plugins folder
+    Path("plugins").mkdir(parents=True, exist_ok=True)
 
-        openapi_spec_filename = f"openapi_spec-{uuid.uuid4()}.yaml"
-        with open(f"plugins/{openapi_spec_filename}", "w") as openapi_spec_file:
-            openapi_spec_file.write(openapi_spec)
+    manifest_filename = f"manifest-{uuid.uuid4()}.yaml"
+    with open(f"plugins/{manifest_filename}", "w") as manifest_file:
+      manifest_file.write(manifest)
 
-        return jsonify({
-            'manifest_file': f"/download/{manifest_filename}",
-            'openapi_spec_file': f"/download/{openapi_spec_filename}",
-            'manifest': manifest,
-            'openapi_spec': openapi_spec
-        })
+    openapi_spec_filename = f"openapi_spec-{uuid.uuid4()}.yaml"
+    with open(f"plugins/{openapi_spec_filename}", "w") as openapi_spec_file:
+      openapi_spec_file.write(openapi_spec)
 
-    return render_template('index.html')
+    return jsonify({
+      'manifest_file': f"/download/{manifest_filename}",
+      'openapi_spec_file': f"/download/{openapi_spec_filename}",
+      'manifest': manifest,
+      'openapi_spec': openapi_spec
+    })
+
+  return render_template('index.html')
+
 
 def index():
-    if request.method == 'POST':
-        swagger_file = request.files['swaggerFile']
-        name = request.form['name']
-        description = request.form['description']
-        url = request.form['url']
-        user_authenticated = request.form['user_authenticated'] == 'true'
-        logo_url = request.form['logo_url']
-        contact_email = request.form['contact_email']
-        legal_info_url = request.form['legal_info_url']
+  if request.method == 'POST':
+    swagger_file = request.files['swaggerFile']
+    name = request.form['name']
+    description = request.form['description']
+    url = request.form['url']
+    user_authenticated = request.form['user_authenticated'] == 'true'
+    logo_url = request.form['logo_url']
+    contact_email = request.form['contact_email']
+    legal_info_url = request.form['legal_info_url']
 
-        if swagger_file:
-            swagger_yaml = yaml.safe_load(swagger_file.read())
-            manifest, openapi_spec = convert_swagger_to_chatgpt_manifest(swagger_yaml, name, description, url, user_authenticated, logo_url, contact_email, legal_info_url)
-            return render_template('index.html', manifest=manifest, openapi_spec=openapi_spec)
-        else:
-            flash('Please upload a valid Swagger (OpenAPI) file.', 'danger')
-            return render_template('index.html')
+    if swagger_file:
+      swagger_yaml = yaml.safe_load(swagger_file.read())
+      manifest, openapi_spec = convert_swagger_to_chatgpt_manifest(
+        swagger_yaml, name, description, url, user_authenticated, logo_url,
+        contact_email, legal_info_url)
+      return render_template('index.html',
+                             manifest=manifest,
+                             openapi_spec=openapi_spec)
+    else:
+      flash('Please upload a valid Swagger (OpenAPI) file.', 'danger')
+      return render_template('index.html')
 
-    return render_template('index.html')
+  return render_template('index.html')
 
-def convert_swagger_to_chatgpt_manifest(swagger_yaml, name, description, base_url, spec_file_name, user_authenticated, logo_url, contact_email, legal_info_url):
-    # Extract relevant information from the Swagger YAML
-    info = swagger_yaml.get('info', {})
-    title = info.get('title', 'My API Plugin')
-    description = info.get('description', 'Plugin for interacting with my API.')
 
-    # Create the ChatGPT manifest
-    manifest = {
-        'schema_version': 'v1',
-        'name_for_human': name or title,
-        'description_for_human': description or 'Plugin for interacting with my API.',
-        'description_for_model': description or 'Plugin for interacting with my API.',
-        'auth': {
-            'type': 'none'
-        },
-        'api': {
-            'type': 'openapi',
-            'url': f"{base_url}/plugins/{spec_file_name}",
-            'is_user_authenticated': user_authenticated
-        },
-        'logo_url': logo_url,
-        'contact_email': contact_email,
-        'legal_info_url': legal_info_url
-    }
+def convert_swagger_to_chatgpt_manifest(swagger_yaml, name, description,
+                                        base_url, spec_file_name,
+                                        user_authenticated, logo_url,
+                                        contact_email, legal_info_url):
+  # Extract relevant information from the Swagger YAML
+  info = swagger_yaml.get('info', {})
+  title = info.get('title', 'My API Plugin')
+  description = info.get('description', 'Plugin for interacting with my API.')
 
-    # Update the endpoints with authentication and POST type
-    paths = swagger_yaml.get('paths', {})
-    for path_key, path_item in paths.items():
-        for method_key, method_item in path_item.items():
-            if method_key.lower() == 'post':
-                method_item['x-auth-type'] = 'none' if not user_authenticated else 'apiKey'
-                method_item['x-auth-location'] = 'query'
+  # Create the ChatGPT manifest
+  manifest = {
+    'schema_version': 'v1',
+    'name_for_human': name or title,
+    'description_for_human': description
+    or 'Plugin for interacting with my API.',
+    'description_for_model': description
+    or 'Plugin for interacting with my API.',
+    'auth': {
+      'type': 'none'
+    },
+    'api': {
+      'type': 'openapi',
+      'url': f"{base_url}/plugins/{spec_file_name}",
+      'is_user_authenticated': user_authenticated
+    },
+    'logo_url': logo_url,
+    'contact_email': contact_email,
+    'legal_info_url': legal_info_url
+  }
 
-    # Convert the manifest dictionary to a YAML string
-    manifest_yaml = yaml.dump(manifest, default_flow_style=False)
+  # Update the endpoints with authentication and POST type
+  paths = swagger_yaml.get('paths', {})
+  for path_key, path_item in paths.items():
+    for method_key, method_item in path_item.items():
+      if method_key.lower() == 'post':
+        method_item[
+          'x-auth-type'] = 'none' if not user_authenticated else 'apiKey'
+        method_item['x-auth-location'] = 'query'
 
-    # Prepare the OpenAPI specification for ChatGPT
-    # This example assumes that the original Swagger YAML is suitable for use as the ChatGPT OpenAPI specification.
-    # You may need to modify or filter the original YAML to suit your needs.
-    openapi_spec_yaml = yaml.dump(swagger_yaml, default_flow_style=False)
+  # Convert the manifest dictionary to a YAML string
+  manifest_yaml = yaml.dump(manifest, default_flow_style=False)
 
-    return manifest_yaml, openapi_spec_yaml
+  # Prepare the OpenAPI specification for ChatGPT
+  # This example assumes that the original Swagger YAML is suitable for use as the ChatGPT OpenAPI specification.
+  # You may need to modify or filter the original YAML to suit your needs.
+  openapi_spec_yaml = yaml.dump(swagger_yaml, default_flow_style=False)
+
+  return manifest_yaml, openapi_spec_yaml
+
 
 @app.route('/.well-known/<path:filename>', methods=['GET'])
 def download(filename):
-    return send_from_directory('plugins', filename, as_attachment=True)
+  return send_from_directory('plugins', filename, as_attachment=True)
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+  app.run(host='0.0.0.0', port=8080)

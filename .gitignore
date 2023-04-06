@@ -1,33 +1,44 @@
-# General
+# .gitignore
+
+# Ignore Replit specific files
+.replit
+
+# Ignore Python cache files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.pyc
 .Python
-env/
+
+# Ignore virtual environments
 venv/
+*.venv
+.env
+.venv/
 ENV/
 env.bak/
-venv.bak/
-*.log
+PythonENV/
 
-# Jupyter Notebook
+# Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints
 
-# Replit
-.replit
+# Ignore data files
+data/
 
-# macOS
+# Ignore plugins folder
+plugins/
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore local configuration files
+.local/
+.vscode/
+
+# Ignore macOS specific files
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Windows
-Thumbs.db
-Desktop.ini
-
-# Linux
-*~
-.directory
-.Trash-*
+._*
+.Spotlight-V100
+.Trashes
