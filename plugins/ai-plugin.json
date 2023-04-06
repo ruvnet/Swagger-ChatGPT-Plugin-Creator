@@ -1,9 +1,9 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Ai Prompt Programming",
+  "name_for_human": "ChatGPT Ai Plugin Creator",
   "name_for_model": "AiPromptProgramming",
-  "description_for_human": "A Plugin to Create New Plugins & Bots. Type /introduction to start",
-  "description_for_model": "A Plugin to Create New Plugins & Bots. Type /introduction to start",
+  "description_for_human": "A Plugin to Create New Plugins & Bots. Type /start to begin",
+  "description_for_model": "A Plugin to Create New Plugins & Bots. Type /start to start, /help, /random, or /convert_curl",
   "auth": {
     "type": "none"
   },

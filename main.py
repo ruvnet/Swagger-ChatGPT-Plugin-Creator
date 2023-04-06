@@ -12,19 +12,20 @@ from pathlib import Path
 from flask import jsonify
 import json
 from werkzeug.routing import BaseConverter
+from urllib.parse import unquote
+import re
+import logging
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 plugins_folder = 'plugins'
-base_url = "https://chatgpt-test-2.ruvnet.repl.co/"  # Replace with your actual base URL
+base_url = "https://chatgpt-dev-1.ruvnet.repl.co"  # Replace with your actual base URL
 
 current_topic = None
 
 # Ensure the plugins folder exists
 if not os.path.exists(plugins_folder):
   os.makedirs(plugins_folder)
-
-import json
 
 class RandomPathConverter(BaseConverter):
     def __init__(self, url_map, *items):
@@ -40,7 +41,6 @@ def load_json_data():
     data = json.load(file, strict=False)
   return data
 
-
 # Define a function to read the contents of the data/instructions.txt file
 def read_instructions_file(filename):
   file_path = os.path.join('data', filename)
@@ -50,6 +50,11 @@ def read_instructions_file(filename):
     return contents
   except FileNotFoundError:
     return "File not found."
+
+@app.before_request
+def log_request_info():
+    logging.info('Headers: %s', request.headers)
+    logging.info('Body: %s', request.get_data())
 
 # Add the requested endpoints
 @app.route('/introduction', methods=['GET', 'POST'])
@@ -103,19 +108,47 @@ def initialize():
     initialize_text = read_instructions_file('initialize.txt')
     return initialize_text
 
-@app.route('/<random_path:path>', methods=['GET', 'POST'])
-def random_route(path):
+@app.route('/random', defaults={'path': ''}, methods=['GET', 'POST'])
+@app.route('/random/<path:path>', methods=['GET', 'POST'])
+def random(path):
     if request.method == 'GET':
-        return f'GET request for /{path}'
+        # Extract JSON payload from the path
+        payload = re.search(r'\{.*\}', unquote(path))
+        if payload:
+            payload_str = payload.group()
+            try:
+                input_data = json.loads(payload_str)
+                topic = input_data.get('topic', 'No topic provided')
+                data = {
+                    'message':
+                    f'You have provided the following topic: {topic}. Here is the output of a manifest.json and specification.yaml in mark down code block.'
+                }
+                return jsonify(data)
+            except json.JSONDecodeError:
+                pass
+        random_text = read_instructions_file('random.txt')
+        return random_text
     elif request.method == 'POST':
         input_data = request.get_json()
         topic = input_data.get('topic', 'No topic provided')
+        random_text = read_instructions_file('random.txt')
         data = {
             'message':
-            f'You have provided the following topic: {topic}. Here is the output of a manifest.json and specification.yaml in mark down code block.'
+            f'You have provided the following topic: {topic}. Here is the output of a manifest.json and specification.yaml in mark down code block.\n\n{random_text}'
         }
         return jsonify(data)
-      
+
+@app.route('/convert_curl', methods=['POST'])
+def convert_curl():
+    input_data = request.get_json()
+    topic = input_data.get('curl_command', '{topic}')
+    random_text = read_instructions_file('random.txt')
+    data = {
+        'message': f'You have provided the following CURL: {topic}. Here is the output of a manifest.json and specification.yaml in mark down code block.\n\n{random_text}'
+    }
+    return jsonify(data)
+
+
 @app.route('/api/v1/create-plugin', methods=['POST'])
 def create_plugin():
   # Process the JSON data
@@ -285,6 +318,6 @@ def convert_swagger_to_chatgpt_manifest(swagger_yaml, name, description,
 def download(filename):
   return send_from_directory('plugins', filename, as_attachment=True)
 
-
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port=8080)
+    logging.basicConfig(level=logging.INFO)
+    app.run(host='0.0.0.0', port=8080)
