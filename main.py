@@ -11,6 +11,7 @@ import yaml
 from pathlib import Path
 from flask import jsonify
 import json
+from werkzeug.routing import BaseConverter
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -25,6 +26,13 @@ if not os.path.exists(plugins_folder):
 
 import json
 
+class RandomPathConverter(BaseConverter):
+    def __init__(self, url_map, *items):
+        super(RandomPathConverter, self).__init__(url_map)
+        self.regex = '(?i).*random.*'
+
+app.url_map.converters['random_path'] = RandomPathConverter
+
 
 def load_json_data():
   data_file_path = os.path.join('data', 'introduction.json')
@@ -34,12 +42,14 @@ def load_json_data():
 
 
 # Define a function to read the contents of the data/instructions.txt file
-def read_instructions_file():
-  file_path = os.path.join('data', 'introduction.txt')
-  with open(file_path, 'r') as file:
-    contents = file.read()
-  return contents
-
+def read_instructions_file(filename):
+  file_path = os.path.join('data', filename)
+  try:
+    with open(file_path, 'r') as file:
+      contents = file.read()
+    return contents
+  except FileNotFoundError:
+    return "File not found."
 
 # Add the requested endpoints
 @app.route('/introduction', methods=['GET', 'POST'])
@@ -49,73 +59,63 @@ def introduction():
     pass
   else:
     # Handle the GET request (default behavior)
-    instructions_text = read_instructions_file()
+    instructions_text = read_instructions_file('introduction.txt')
     return instructions_text  # Return the contents of the file as plain text
 
-
-@app.route('/purpose')
+@app.route('/purpose', methods=['GET'])
 def purpose():
-  data = {'message': 'This is the purpose endpoint.'}
-  return jsonify(data)
+    purpose_text = read_instructions_file('purpose.txt')
+    return purpose_text
 
 
-@app.route('/context')
+@app.route('/context', methods=['GET'])
 def context():
-  data = {'message': 'This is the context endpoint.'}
-  return jsonify(data)
+    context_text = read_instructions_file('context.txt')
+    return context_text
 
 
-@app.route('/examples')
+@app.route('/examples', methods=['GET'])
 def examples():
-  data = {'message': 'This is the examples endpoint.'}
-  return jsonify(data)
+    examples_text = read_instructions_file('examples.txt')
+    return examples_text
 
 
-@app.route('/errors')
+@app.route('/errors', methods=['GET'])
 def errors():
-  data = {'message': 'This is the errors endpoint.'}
-  return jsonify(data)
+    errors_text = read_instructions_file('errors.txt')
+    return errors_text
 
 
-@app.route('/commands')
+@app.route('/commands', methods=['GET'])
 def commands():
-  data = {'message': 'This is the commands endpoint.'}
-  return jsonify(data)
+    commands_text = read_instructions_file('commands.txt')
+    return commands_text
 
 
-@app.route('/action')
+@app.route('/action', methods=['GET'])
 def action():
-  data = {
-    'message':
-    'Define action commands wrapped in {{command}}.\n\nExample: {{command}}'
-  }
-  return jsonify(data)
+    action_text = read_instructions_file('action.txt')
+    return action_text
 
 
-@app.route('/initialize')
+@app.route('/initialize', methods=['GET'])
 def initialize():
-  data = {'message': 'This is the initialize endpoint.'}
-  return jsonify(data)
+    initialize_text = read_instructions_file('initialize.txt')
+    return initialize_text
 
-
-@app.route('/random', methods=['GET', 'POST'])
-def random():
-  if request.method == 'GET':
-    data = {
-      'message':
-      'creates a random ChatGPT Plugin bot and provides a output of a manifest.json and specification.yaml in a mark down code block.'
-    }
-    return jsonify(data)
-  elif request.method == 'POST':
-    input_data = request.get_json()
-    topic = input_data.get('topic', 'No topic provided')
-    data = {
-      'message':
-      f'You have provided the following topic: {topic}. Here is the output of a manifest.json and specification.yaml in mark down code block.'
-    }
-    return jsonify(data)
-
-
+@app.route('/<random_path:path>', methods=['GET', 'POST'])
+def random_route(path):
+    if request.method == 'GET':
+        return f'GET request for /{path}'
+    elif request.method == 'POST':
+        input_data = request.get_json()
+        topic = input_data.get('topic', 'No topic provided')
+        data = {
+            'message':
+            f'You have provided the following topic: {topic}. Here is the output of a manifest.json and specification.yaml in mark down code block.'
+        }
+        return jsonify(data)
+      
 @app.route('/api/v1/create-plugin', methods=['POST'])
 def create_plugin():
   # Process the JSON data

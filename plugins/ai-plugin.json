@@ -1,18 +1,18 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Plugin Test 2",
-  "name_for_model": "prodocs",
-  "description_for_human": "Plugin Test 2.",
-  "description_for_model": "Plugin Test 2",
+  "name_for_human": "Ai Prompt Programming",
+  "name_for_model": "AiPromptProgramming",
+  "description_for_human": "A Plugin to Create New Plugins & Bots. Type /introduction to start",
+  "description_for_model": "A Plugin to Create New Plugins & Bots. Type /introduction to start",
   "auth": {
     "type": "none"
   },
   "api": {
     "type": "openapi",
-    "url": "https://chatgpt-test-2.ruvnet.repl.co/.well-known/spec.yaml",
+    "url": "https://chatgpt-dev-1.ruvnet.repl.co/.well-known/spec.yaml",
     "is_user_authenticated": false
   },
-  "logo_url": "https://chatgpt-test-2.ruvnet.repl.co/.well-known/logo.jpg",
+  "logo_url": "https://chatgpt-dev-1.ruvnet.repl.co/.well-known/logo.jpg",
   "contact_email": "ruv@ruv.net",
-  "legal_info_url": "https://chatgpt-test-2.ruvnet.repl.co/legal"
+  "legal_info_url": "https://chatgpt-dev-1.ruvnet.repl.co/legal"
 }
